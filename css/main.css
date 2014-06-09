@@ -3,7 +3,7 @@
 	margin: 0 auto;
 }
 
-#results {
+#results, #error {
 	background-color: #f4f8fa;
 	margin: 20px 0;
 	padding: 20px;
@@ -11,7 +11,7 @@
 	display: none;
 }
 
-#results h4 {
+#results h4, #error h4 {
 	color: #5bc0de;
 }
 

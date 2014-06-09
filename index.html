@@ -3,9 +3,9 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+       
     <meta name="author" content="mij">
-    <title>Toil and flexi</title>
+    <title>Calculate flexi + toil</title>
 
     <link href="http://tarruda.github.io/bootstrap-datetimepicker/assets/css/bootstrap.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap-datetimepicker.min.css">
@@ -53,6 +53,11 @@
       <div id="results_decimal"></div>
     </div>
 
+    <div id="error">
+        <h4>Wait! ... where's the time?</h4>
+        <img src='img/error.gif' width='' />
+    </div>
+
   </div>
 
   <script type="text/javascript" src="js/jquery.min.js"></script><style type="text/css"></style>
@@ -91,6 +96,7 @@
         time_properties.flexi = '';
         time_properties.afternoon_toil = '';
         time_properties.morning_toil = '';
+        $('#error,#results').hide();
 
         // get start time and break down the values
         var start = $('#start_val').val();
@@ -106,7 +112,7 @@
 
         // has the user completed both forms?
         if(start === '' || end === '') {
-          alert('noooooo! Please complete start and end times :(');
+          $('#error').show();
           return;
         }
 
