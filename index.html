@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Date/Time Picker for Twitter Bootstrap">
+    
+    <meta name="author" content="mij">
+    <title>Bootstrap Date/Time Picker</title>
+
+    <link href="http://tarruda.github.io/bootstrap-datetimepicker/assets/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/main.css">
+</head>
+<body>
+
+  <div id="wrapper">
+
+    <h2>Calculate flexi + toil</h2>
+
+    <div class="well">
+      <h4>Start of the day:</h4> 
+      <div id="start" class="input-append">
+        <input data-format="hh:mm" type="text" id="start_val"></input>
+        <span class="add-on">
+          <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+        </span>
+      </div>
+    </div>
+
+    <div class="well">
+      <h4>End of the day:</h4> 
+      <div id="finish" class="input-append">
+        <input data-format="hh:mm" type="text" id="end_val"></input>
+        <span class="add-on">
+          <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+        </span>
+      </div>
+    </div>
+
+    <div class="well">
+      <h4>Minutes for lunch:</h4> 
+      <div id="finish" class="input-append">
+        <input data-format="hh:mm" type="text" id="lunch"></input>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-primary btn-lg" id="calculateTime">Calculate Time</button>
+
+    <div id="results">
+      <h4>Time</h4>
+      <div id="results_time"></div>
+      <h4>Decimal</h4>
+      <div id="results_decimal"></div>
+    </div>
+
+  </div>
+
+  <script type="text/javascript" src="js/jquery.min.js"></script><style type="text/css"></style>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script> 
+
+  <script type="text/javascript">
+    $(function() {
+      // start time
+      $('#start').datetimepicker({
+        pickDate: false,
+        pickSeconds: false
+      });
+      // end time
+      $('#finish').datetimepicker({
+        pickDate: false,
+        pickSeconds: false
+      });
+
+      // time properties object
+      time_properties = {
+        start_hours : '08',
+        start_min : '00',
+        end_hours : '18',
+        end_min : '15',
+        morning_toil : '',
+        flexi : '',
+        afternoon_toil : '',
+        has_morning_toil : false,
+        has_afternoon_toil : false
+      };
+
+      $('#calculateTime').click(function(){
+
+        // reset values
+        time_properties.flexi = '';
+        time_properties.afternoon_toil = '';
+        time_properties.morning_toil = '';
+
+        // get start time and break down the values
+        var start = $('#start_val').val();
+        var start_split = start.split(':');
+        var start_hours = start_split[0];
+        var start_min = start_split[1];
+
+        // get end time and break down the values
+        var end = $('#end_val').val();
+        var end_split = end.split(':');
+        var end_hours = end_split[0];
+        var end_min = end_split[1];
+
+        // has the user completed both forms?
+        if(start === '' || end === '') {
+          alert('noooooo! Please complete start and end times :(');
+          return;
+        }
+
+        // calculate if the start time is before 08:00
+        if((start_hours + '.' + start_min) < time_properties.start_hours + '.' + time_properties.start_min) {
+          calculate_time.morning_toil(start_hours , start_min);
+          time_properties.has_morning_toil = true;
+        }else {
+          time_properties.has_morning_toil = false;
+        }
+
+        // calculate if the end time is before 18:15
+        if((end_hours + '.' + end_min) > time_properties.end_hours + '.' + time_properties.end_min) {
+          calculate_time.afternoon_toil(end_hours , end_min);
+          time_properties.has_afternoon_toil = true;
+        }else {
+          time_properties.has_afternoon_toil = false;
+        }
+
+        // calculate the flexi
+        calculate_time.flexi(start_hours , start_min , end_hours , end_min);
+
+        toil = calculate_time.time_format( time_properties.morning_toil + time_properties.afternoon_toil );
+
+        $('#results_time').html('<strong>Flexi:</strong> ' + time_properties.flexi + ' <strong>Toil:</strong> ' + toil);       
+        $('#results_decimal').html('<strong>Flexi:</strong> ' + calculate_time.time_to_decimal(time_properties.flexi) + ' <strong>Toil:</strong> ' + calculate_time.time_to_decimal(toil));   
+
+        $('#results').show();    
+      });
+
+      // calculate time functions
+      calculate_time = {
+        morning_toil : function(hours , min) {
+          time = calculate_time.time_difference(hours , min , time_properties.start_hours , time_properties.start_min , 'morning');
+          time_properties.morning_toil = time;
+        },
+        flexi : function(start_hours , start_min , end_hours , end_min) {
+
+          if(time_properties.has_morning_toil) {
+            start_hours = time_properties.start_hours;
+            start_min = time_properties.start_min;
+          }
+          if(time_properties.has_afternoon_toil) {
+            end_hours = time_properties.end_hours;
+            end_min = time_properties.end_min;
+          }
+
+          time = calculate_time.time_difference(start_hours , start_min , end_hours , end_min , 'morning');
+          lunch = $('#lunch').val() * 60000;
+          time_properties.flexi = calculate_time.time_format(time - lunch);
+        },
+        afternoon_toil : function(hours , min) {
+          time = calculate_time.time_difference(hours , min , time_properties.end_hours , time_properties.end_min , 'afternoon');
+          time_properties.afternoon_toil = time;
+        },
+        time_difference : function(start_hours , start_min , end_hours , end_min , type) {
+          var date1 = new Date(2000, 0, 1,  start_hours, start_min); 
+          var date2 = new Date(2000, 0, 1, end_hours, end_min);
+
+          if(type === 'morning') {
+            diff = date2 - date1;
+          }            
+          else {
+            diff = date1 - date2;
+          }
+            
+          return diff;
+        },
+        time_format : function(diff) {
+          var msec = diff;
+          var hh = Math.floor(msec / 1000 / 60 / 60);
+          msec -= hh * 1000 * 60 * 60;
+          var mm = Math.floor(msec / 1000 / 60);
+          msec -= mm * 1000 * 60;
+          var ss = Math.floor(msec / 1000);
+          msec -= ss * 1000;
+
+          return hh + ':' + mm;         
+        },
+        time_to_decimal : function(time) {
+          var hoursMinutes = time.split(/[.:]/);
+          var hours = parseInt(hoursMinutes[0], 10);
+          var minutes = hoursMinutes[1] ? parseInt(hoursMinutes[1], 10) : 0;
+          decimal_val = hours + minutes / 60;
+
+          return decimal_val.toFixed(2);
+        }
+      };
+
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+#wrapper {
+	width: 300px;
+	margin: 0 auto;
+}
+
+#results {
+	background-color: #f4f8fa;
+	margin: 20px 0;
+	padding: 20px;
+	border-left: 3px solid #5bc0de;
+	display: none;
+}
+
+#results h4 {
+	color: #5bc0de;
+}
+
+h2 {
+	color: #5bc0de;
+	font-size: 2em;
+}
+
+h4 {
+	color: #5bc0de;
+}
