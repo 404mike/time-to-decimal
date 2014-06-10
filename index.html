@@ -190,6 +190,10 @@
           var ss = Math.floor(msec / 1000);
           msec -= ss * 1000;
 
+          if(mm.toString().length === 1) {
+            mm = '0' + mm;
+          }
+
           return hh + ':' + mm;         
         },
         time_to_decimal : function(time) {
