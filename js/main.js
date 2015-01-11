@@ -79,6 +79,8 @@ $(function () {
     calculate_time = {
         morning_toil: function (hours, min) {
             time = calculate_time.time_difference(hours, min, time_properties.start_hours, time_properties.start_min, 'morning');
+            // before core hours - time and a half
+            time = time * 1.5;
             time_properties.morning_toil = time;
         },
         flexi: function (start_hours, start_min, end_hours, end_min) {
